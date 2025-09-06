@@ -1,0 +1,56 @@
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api  # All our APIs will start with /api
+
+# Spring Configuration
+spring:
+  application:
+    name: project-management-system
+
+  # Database Configuration - LOCAL (FREE)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project_management_db
+    username: postgres
+    password: shashank@post  # Change this to your PostgreSQL password
+    driver-class-name: org.postgresql.Driver
+
+  # Alternative: FREE Cloud Database (Neon.tech)
+  # Uncomment below and comment above when ready for cloud
+  # datasource:
+  #   url: jdbc:postgresql://your-neon-host:5432/your-db-name?sslmode=require
+  #   username: your-neon-username
+  #   password: your-neon-password
+  #   driver-class-name: org.postgresql.Driver
+
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # Creates/updates tables automatically
+    show-sql: true     # Shows SQL queries in console (useful for debugging)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true  # Pretty-prints SQL queries
+
+  # Security Configuration
+  security:
+    user:
+      name: admin  # Default username (we'll override this later)
+      password: admin  # Default password (we'll override this later)
+
+# JWT Configuration
+app:
+  jwt:
+    secret: mySecretKey123456789012345678901234567890  # Change this in production!
+    expiration: 86400000  # 24 hours in milliseconds
+
+# Logging Configuration
+logging:
+  level:
+    com.projectmanager.pms: DEBUG  # Debug level for our application
+    org.springframework.security: DEBUG  # Security debug (remove in production)
+    org.hibernate.SQL: DEBUG  # Show SQL queries
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
