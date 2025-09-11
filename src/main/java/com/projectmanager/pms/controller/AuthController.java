@@ -47,27 +47,6 @@ public class AuthController {
     }
 
     /**
-     * Test endpoint to verify JWT token
-     * URL: GET /api/auth/verify-token
-     * @param authHeader - Authorization header with Bearer token
-     * @return token verification result
-     */
-    @GetMapping("/verify-token")
-    public ResponseEntity<?> verifyToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
-        }
-
-        try {
-            String token = authHeader.substring(7); // Remove "Bearer " prefix
-            // We'll implement proper token verification later with JWT filter
-            return ResponseEntity.ok("Token format is valid");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-        }
-    }
-
-    /**
      * Health check for authentication service
      * URL: GET /api/auth/health
      * @return service health status

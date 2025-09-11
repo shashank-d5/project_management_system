@@ -43,8 +43,10 @@ spring:
 # JWT Configuration
 app:
   jwt:
-    secret: mySecretKey123456789012345678901234567890  # Change this in production!
-    expiration: 86400000  # 24 hours in milliseconds
+    # Your old secret was too short for the HS512 algorithm
+    # secret: mySecretKey123456789012345678901234567890
+    secret: R4t6w9z$C&F)J@NcRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s6v9y$B&E)H+MbQeTh
+    expiration: 86400000
 
 # Logging Configuration
 logging:

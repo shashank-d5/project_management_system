@@ -124,7 +124,7 @@ public class JwtUtil {
     private String extractFullNameFromUserDetails(UserDetails userDetails) {
         // For now, return empty string. We'll enhance this later
         // when we implement our custom UserDetails class
-        return "";
+        return userDetails.getUsername(); // Return username for now
     }
 
     /**
