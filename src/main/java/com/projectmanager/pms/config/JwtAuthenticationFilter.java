@@ -1,5 +1,10 @@
 package com.projectmanager.pms.config;
 
+// --- CHANGE 1: ADD THESE IMPORTS ---
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+// --- END CHANGE 1 ---
+
 import com.projectmanager.pms.service.UserService;
 import com.projectmanager.pms.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -16,13 +21,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * JWT Authentication Filter
- * This filter runs on every HTTP request to validate JWT tokens
- * If valid token is found, it sets the user in Spring Security context
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    // --- CHANGE 2: ADD THIS LINE TO DECLARE THE LOGGER ---
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    // --- END CHANGE 2 ---
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -30,85 +34,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 
-    /**
-     * Filter method that runs on every HTTP request
-     * Extracts JWT token from Authorization header and validates it
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            // Extract JWT token from Authorization header
             String jwt = extractJwtFromRequest(request);
 
-            // If token exists and user is not already authenticated
             if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                // Extract username from token
                 String username = jwtUtil.extractUsername(jwt);
 
                 if (username != null) {
-                    // Load user details from database
                     UserDetails userDetails = userService.loadUserByUsername(username);
 
-                    // Validate token against user details
                     if (jwtUtil.validateToken(jwt, userDetails)) {
-                        // Create authentication token
                         UsernamePasswordAuthenticationToken authToken =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails,
                                         null,
                                         userDetails.getAuthorities()
                                 );
-
-                        // Set additional details
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                        // Set authentication in Spring Security context
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
             }
         } catch (Exception e) {
-            // Log the error but don't block the request
-            // Invalid tokens will result in unauthenticated requests
-            logger.error("Cannot set user authentication: {}");
+            // This line now works correctly because the 'logger' object exists
+            logger.error("Cannot set user authentication: {}", e.getMessage());
         }
 
-        // Continue with the filter chain
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * Extract JWT token from Authorization header
-     * @param request - HTTP request
-     * @return JWT token or null if not found/invalid format
-     */
     private String extractJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-
-        // Check if header exists and starts with "Bearer "
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // Remove "Bearer " prefix
+            return bearerToken.substring(7);
         }
-
         return null;
     }
 
-    /**
-     * Determine if this filter should be applied to the request
-     * We can skip certain paths like login, register, public endpoints
-     */
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-
-        // Skip JWT validation for these paths
-        return path.startsWith("/api/auth/login") ||
-                path.startsWith("/api/auth/register") ||
-                path.startsWith("/api/auth/health") ||
-                path.startsWith("/api/test/") ||
-                path.startsWith("/api/data-test/");
-    }
+    // --- CHANGE 3: REMOVE THE ENTIRE shouldNotFilter METHOD ---
+    // This method is no longer needed and can cause conflicts.
+    // The SecurityConfig is now the single source of truth for public paths.
+    // --- END CHANGE 3 ---
 }

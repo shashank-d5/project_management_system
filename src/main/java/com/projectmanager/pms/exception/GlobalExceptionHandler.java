@@ -92,6 +92,38 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle project not found exceptions
+     * @param ex - project not found exception
+     * @return error response
+     */
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleProjectNotFoundException(ProjectNotFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "error");
+        response.put("message", ex.getMessage());
+        response.put("errorCode", "PROJECT_NOT_FOUND");
+        response.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    /**
+     * Handle project access denied exceptions
+     * @param ex - project access denied exception
+     * @return error response
+     */
+    @ExceptionHandler(ProjectAccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleProjectAccessDeniedException(ProjectAccessDeniedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "error");
+        response.put("message", ex.getMessage());
+        response.put("errorCode", "PROJECT_ACCESS_DENIED");
+        response.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    /**
      * Handle illegal argument exceptions
      * @param ex - illegal argument exception
      * @return error response
